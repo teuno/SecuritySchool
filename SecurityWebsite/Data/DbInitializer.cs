@@ -11,17 +11,16 @@ namespace SecurityWebsite.Data
 {
     public class DbInitializer
     {
-        private const string _roleAdministrator = "Administrator";
-        private const string _roleHelpdesk = "Helpdesk";
-        private const string _roleNormal = "Normal";
+        private const string RoleAdministrator = "Administrator";
+        private const string RoleHelpdesk = "Helpdesk";
+        private const string RoleNormal = "Normal";
 
-        private readonly string[] _defaultRoles = {_roleAdministrator, _roleHelpdesk, _roleNormal};
+        private readonly string[] _defaultRoles = {RoleAdministrator, RoleHelpdesk, RoleNormal};
 
-        private string _adminEmail = "administrator@secwindesheim.nl";
-        private string _helpdeskEmail = "helpdesk@secwindesheim.nl";
-        private string _normalEmail = "normal@secwindesheim.nl";
-        private string _veryUnsafeTestPassword = "Welkom01!";
-
+        private const string AdminEmail = "administrator@secwindesheim.nl";
+        private const string HelpdeskEmail = "helpdesk@secwindesheim.nl";
+        private const string NormalEmail = "normal@secwindesheim.nl";
+        private const string VeryUnsafeTestPassword = "Welkom01!";
 
         private readonly ApplicationDbContext _dbContext;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -65,9 +64,9 @@ namespace SecurityWebsite.Data
 
         private async Task EnsureDefaultUsers()
         {
-            await CreateUsersWithRole(_roleAdministrator, _adminEmail);
-            await CreateUsersWithRole(_roleHelpdesk, _helpdeskEmail);
-            await CreateUsersWithRole(_roleNormal, _normalEmail);
+            await CreateUsersWithRole(RoleAdministrator, AdminEmail);
+            await CreateUsersWithRole(RoleHelpdesk, HelpdeskEmail);
+            await CreateUsersWithRole(RoleNormal, NormalEmail);
         }
 
         private async Task CreateUsersWithRole(string role, string email)
@@ -82,7 +81,7 @@ namespace SecurityWebsite.Data
                     UserName = email,
                 };
 
-                await _userManager.CreateAsync(user, _veryUnsafeTestPassword);
+                await _userManager.CreateAsync(user, VeryUnsafeTestPassword);
                 await _userManager.AddToRoleAsync(user, role);
             }
         }
