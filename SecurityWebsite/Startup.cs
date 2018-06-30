@@ -26,8 +26,14 @@ namespace SecurityWebsite
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            var connection = @"User ID =" + Environment.GetEnvironmentVariable("POSTGRES_USER") + ";Password=" +
+                             Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") +
+                             ";Host=" + Environment.GetEnvironmentVariable("POSTGRES_HOST") + ";Port=" +
+                             Environment.GetEnvironmentVariable("POSTGRES_PORT")
+                             + ";Database=security-website;Pooling=true; ";
+
+            services.AddEntityFrameworkNpgsql().AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(connection));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
