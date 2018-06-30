@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -9,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SecurityWebsite.Models;
 using SecurityWebsite.Models.ManageViewModels;
 using SecurityWebsite.Services;
@@ -131,6 +129,7 @@ namespace SecurityWebsite.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator,Helpdesk")]
         public async Task<IActionResult> ChangePassword()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -150,6 +149,7 @@ namespace SecurityWebsite.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator,Helpdesk")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
@@ -179,6 +179,7 @@ namespace SecurityWebsite.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator,Helpdesk")]
         public async Task<IActionResult> SetPassword()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -199,6 +200,7 @@ namespace SecurityWebsite.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator,Helpdesk")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
         {
