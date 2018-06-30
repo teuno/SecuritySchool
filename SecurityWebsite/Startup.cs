@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using SecurityWebsite.Data;
 using SecurityWebsite.Models;
 using SecurityWebsite.Services;
@@ -26,23 +27,67 @@ namespace SecurityWebsite
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Database(services);
+            AspNetIdentityOptions(services);
+
+            // Add application services.
+            services.AddTransient<IEmailSender, EmailSender>();
+
+            services.AddTransient<DbInitializer>();
+
+            services.AddMvc().AddJsonOptions(options =>
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+        }
+
+        private void Database(IServiceCollection services)
+        {
             var connection = @"User ID =" + Environment.GetEnvironmentVariable("POSTGRES_USER") + ";Password=" +
                              Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") +
                              ";Host=" + Environment.GetEnvironmentVariable("POSTGRES_HOST") + ";Port=" +
                              Environment.GetEnvironmentVariable("POSTGRES_PORT")
                              + ";Database=security-website;Pooling=true; ";
-
             services.AddEntityFrameworkNpgsql().AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connection));
+        }
 
+        private void AspNetIdentityOptions(IServiceCollection services)
+        {
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            // Add application services.
-            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = false;
+                options.Password.RequiredUniqueChars = 6;
 
-            services.AddMvc();
+                // Lockout settings
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                options.Lockout.MaxFailedAccessAttempts = 10;
+                options.Lockout.AllowedForNewUsers = true;
+
+                // User settings
+                options.User.RequireUniqueEmail = true;
+            });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                // If the LoginPath isn't set, ASP.NET Core defaults 
+                // the path to /Account/Login.
+                options.LoginPath = "/Account/Login";
+                // If the AccessDeniedPath isn't set, ASP.NET Core defaults 
+                // the path to /Account/AccessDenied.
+                options.AccessDeniedPath = "/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,6 +114,9 @@ namespace SecurityWebsite
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+            DbInitializer.Run(app.ApplicationServices).Wait();
         }
     }
+
+
 }
