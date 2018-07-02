@@ -38,7 +38,7 @@ namespace SecurityWebsite
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {   
+        {
             Database(services);
             AspNetIdentityOptions(services);
 
@@ -59,10 +59,16 @@ namespace SecurityWebsite
 
         private void Database(IServiceCollection services)
         {
-            var connection = @"User ID =" + Environment.GetEnvironmentVariable("POSTGRES_USER") + ";Password=" +
-                             Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") +
-                             ";Host=" + Environment.GetEnvironmentVariable("POSTGRES_HOST") + ";Port=" +
-                             Environment.GetEnvironmentVariable("POSTGRES_PORT")
+//            var connection = @"User ID =" + Environment.GetEnvironmentVariable("POSTGRES_USER") + ";Password=" +
+//                             Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") +
+//                             ";Host=" + Environment.GetEnvironmentVariable("POSTGRES_HOST") + ";Port=" +
+//                             Environment.GetEnvironmentVariable("POSTGRES_PORT")
+//                             + ";Database=security-website;Pooling=true; ";
+
+            var connection = @"User ID =" + Configuration["POSTGRES_USER"] + ";Password=" +
+                             Configuration["POSTGRES_PASSWORD"] +
+                             ";Host=" + Configuration["POSTGRES_HOST"] + ";Port=" +
+                             Configuration["POSTGRES_PORT"]
                              + ";Database=security-website;Pooling=true; ";
             services.AddEntityFrameworkNpgsql().AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connection));
@@ -135,6 +141,4 @@ namespace SecurityWebsite
             DbInitializer.Run(app.ApplicationServices).Wait();
         }
     }
-
-
 }
