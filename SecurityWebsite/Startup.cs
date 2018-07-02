@@ -114,7 +114,7 @@ namespace SecurityWebsite
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-            DbInitializer.Run(app.ApplicationServices).Wait();
+//            DbInitializer.Run(app.ApplicationServices).Wait();
         }
     }
 
