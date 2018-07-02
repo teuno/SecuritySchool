@@ -59,12 +59,6 @@ namespace SecurityWebsite
 
         private void Database(IServiceCollection services)
         {
-//            var connection = @"User ID =" + Environment.GetEnvironmentVariable("POSTGRES_USER") + ";Password=" +
-//                             Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") +
-//                             ";Host=" + Environment.GetEnvironmentVariable("POSTGRES_HOST") + ";Port=" +
-//                             Environment.GetEnvironmentVariable("POSTGRES_PORT")
-//                             + ";Database=security-website;Pooling=true; ";
-
             var connection = @"User ID =" + Configuration["POSTGRES_USER"] + ";Password=" +
                              Configuration["POSTGRES_PASSWORD"] +
                              ";Host=" + Configuration["POSTGRES_HOST"] + ";Port=" +

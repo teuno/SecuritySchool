@@ -12,7 +12,7 @@ using SecurityWebsite.Services;
 
 namespace SecurityWebsite.Controllers
 {
-//    [Authorize]
+    [Authorize]
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
@@ -199,7 +199,7 @@ namespace SecurityWebsite.Controllers
         }
 
         [HttpGet]
-//        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         public IActionResult Register(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -207,7 +207,7 @@ namespace SecurityWebsite.Controllers
         }
 
         [HttpPost]
-//        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
