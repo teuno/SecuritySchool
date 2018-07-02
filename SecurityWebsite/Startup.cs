@@ -17,9 +17,21 @@ namespace SecurityWebsite
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json",
+                    optional: false,
+                    reloadOnChange: true)
+                .AddEnvironmentVariables();
+
+            if (env.IsDevelopment())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
+
+            Configuration = builder.Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -29,6 +41,12 @@ namespace SecurityWebsite
         {
             Database(services);
             AspNetIdentityOptions(services);
+
+            services.AddAuthentication().AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+            });
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
@@ -41,10 +59,10 @@ namespace SecurityWebsite
 
         private void Database(IServiceCollection services)
         {
-            var connection = @"User ID =" + Environment.GetEnvironmentVariable("POSTGRES_USER") + ";Password=" +
-                             Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") +
-                             ";Host=" + Environment.GetEnvironmentVariable("POSTGRES_HOST") + ";Port=" +
-                             Environment.GetEnvironmentVariable("POSTGRES_PORT")
+            var connection = @"User ID =" + Configuration["POSTGRES_USER"] + ";Password=" +
+                             Configuration["POSTGRES_PASSWORD"] +
+                             ";Host=" + Configuration["POSTGRES_HOST"] + ";Port=" +
+                             Configuration["POSTGRES_PORT"]
                              + ";Database=security-website;Pooling=true; ";
             services.AddEntityFrameworkNpgsql().AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connection));
@@ -117,6 +135,4 @@ namespace SecurityWebsite
             DbInitializer.Run(app.ApplicationServices).Wait();
         }
     }
-
-
 }
