@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -59,11 +56,9 @@ namespace SecurityWebsite
 
         private void Database(IServiceCollection services)
         {
-            var connection = @"User ID =" + Configuration["POSTGRES_USER"] + ";Password=" +
-                             Configuration["POSTGRES_PASSWORD"] +
-                             ";Host=" + Configuration["POSTGRES_HOST"] + ";Port=" +
-                             Configuration["POSTGRES_PORT"]
-                             + ";Database=security-website;Pooling=true; ";
+            var connection =
+                $"User ID ={Configuration["POSTGRES_USER"]};Password={Configuration["POSTGRES_PASSWORD"]};Host={Configuration["POSTGRES_HOST"]};Port={Configuration["POSTGRES_PORT"]};Database=security-website;Pooling=true;";
+
             services.AddEntityFrameworkNpgsql().AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connection));
         }
