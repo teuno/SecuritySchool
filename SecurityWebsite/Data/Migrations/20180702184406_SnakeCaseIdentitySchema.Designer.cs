@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using SecurityWebsite.Data;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using System;
 
 namespace SecurityWebsite.Data.Migrations
