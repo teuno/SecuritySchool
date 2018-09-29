@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -38,6 +39,7 @@ namespace SecurityWebsite
         {
             Database(services);
             AspNetIdentityOptions(services);
+            AddHttpsOptions(services);
 
             services.AddAuthentication().AddGoogle(googleOptions =>
             {
@@ -47,11 +49,25 @@ namespace SecurityWebsite
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
-
             services.AddTransient<DbInitializer>();
 
             services.AddMvc().AddJsonOptions(options =>
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+
+   
+        }
+
+        private void AddHttpsOptions(IServiceCollection services)
+        {
+            services.AddHsts(options =>
+            {
+            });
+
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                options.HttpsPort = 44370;
+            });
         }
 
         private void Database(IServiceCollection services)
@@ -115,8 +131,9 @@ namespace SecurityWebsite
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
-
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseAuthentication();
@@ -127,8 +144,6 @@ namespace SecurityWebsite
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-//            192.168.1.105
-//            DbInitializer.Run(app.ApplicationServices).Wait();
         }
     }
 }
