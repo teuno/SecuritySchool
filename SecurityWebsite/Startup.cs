@@ -127,8 +127,6 @@ namespace SecurityWebsite
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-//            192.168.1.105
-//            DbInitializer.Run(app.ApplicationServices).Wait();
         }
     }
 }
