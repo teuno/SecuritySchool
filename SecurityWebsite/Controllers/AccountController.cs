@@ -36,6 +36,7 @@ namespace SecurityWebsite.Controllers
         [TempData] public string ErrorMessage { get; set; }
 
         [HttpGet]
+//        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null)
         {
@@ -47,6 +48,7 @@ namespace SecurityWebsite.Controllers
         }
 
         [HttpPost]
+//        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
@@ -73,6 +75,8 @@ namespace SecurityWebsite.Controllers
                 }
 
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+
+                Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate private";
                 return View(model);
             }
 

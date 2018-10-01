@@ -1,15 +1,20 @@
 ﻿using System;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using SecurityWebsite.Data;
 using SecurityWebsite.Models;
 using SecurityWebsite.Services;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace SecurityWebsite
 {
@@ -40,6 +45,8 @@ namespace SecurityWebsite
             Database(services);
             AspNetIdentityOptions(services);
             AddHttpsOptions(services);
+            services.AddResponseCaching();
+
 
             services.AddAuthentication().AddGoogle(googleOptions =>
             {
@@ -61,6 +68,7 @@ namespace SecurityWebsite
         {
             services.AddHsts(options =>
             {
+
             });
 
             services.AddHttpsRedirection(options =>
@@ -116,6 +124,7 @@ namespace SecurityWebsite
                 // the path to /Account/AccessDenied.
                 options.AccessDeniedPath = "/Account/AccessDenied";
                 options.SlidingExpiration = true;
+
             });
         }
 
@@ -133,7 +142,33 @@ namespace SecurityWebsite
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+            app.UseResponseCaching();
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                HttpOnly = HttpOnlyPolicy.Always,
+                Secure = CookieSecurePolicy.Always,
+                MinimumSameSitePolicy = SameSiteMode.None
+            });
+
             app.UseHttpsRedirection();
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+                //https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
+                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                //https://stackoverflow.com/questions/9090577/what-is-the-http-header-x-xss-protection
+                context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
+            //https://stackoverflow.com/questions/49547/how-to-control-web-page-caching-across-all-browsers
+
+
+                context.Response.Headers.Add("Cache-Control", "no-store, no-cache, must-revalidate private");// HTTP 1.1.
+                context.Response.Headers.Add("Pragma", "no-cache");// HTTP 1.0.
+                await next();
+            });
+
+
+         
             app.UseStaticFiles();
 
             app.UseAuthentication();
