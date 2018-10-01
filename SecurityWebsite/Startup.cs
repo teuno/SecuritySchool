@@ -45,8 +45,6 @@ namespace SecurityWebsite
             Database(services);
             AspNetIdentityOptions(services);
             AddHttpsOptions(services);
-            services.AddResponseCaching();
-
 
             services.AddAuthentication().AddGoogle(googleOptions =>
             {
@@ -60,8 +58,6 @@ namespace SecurityWebsite
 
             services.AddMvc().AddJsonOptions(options =>
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
-
-   
         }
 
         private void AddHttpsOptions(IServiceCollection services)
@@ -124,7 +120,6 @@ namespace SecurityWebsite
                 // the path to /Account/AccessDenied.
                 options.AccessDeniedPath = "/Account/AccessDenied";
                 options.SlidingExpiration = true;
-
             });
         }
 
@@ -142,7 +137,6 @@ namespace SecurityWebsite
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-            app.UseResponseCaching();
             app.UseCookiePolicy(new CookiePolicyOptions
             {
                 HttpOnly = HttpOnlyPolicy.Always,
@@ -167,10 +161,7 @@ namespace SecurityWebsite
                 await next();
             });
 
-
-         
             app.UseStaticFiles();
-
             app.UseAuthentication();
 
             app.UseMvc(routes =>
